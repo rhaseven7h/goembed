@@ -81,20 +81,25 @@ func main() {
 		fmt.Sprintf("\t%#v", "encoding/base64"),
 		")",
 		"",
-		fmt.Sprintf("%s, _ := base64.StdEncoding.DecodeString(%#v +", variableName, ""),
+		fmt.Sprintf("var %s []byte", variableName),
+		"",
+		"func init() {",
+		fmt.Sprintf("\t%s, _ = base64.StdEncoding.DecodeString(", variableName),
+		fmt.Sprintf("\t\t%#v +", ""),
 	}
 	for len(encodedInput) > 0 {
 		lineLength := outputLinesMaxLength
 		if len(encodedInput) < outputLinesMaxLength {
 			lineLength = len(encodedInput)
 		}
-		outputLine := fmt.Sprintf("\t%#v +", encodedInput[0:lineLength])
+		outputLine := fmt.Sprintf("\t\t\t%#v +", encodedInput[0:lineLength])
 		outputDataLines = append(outputDataLines, outputLine)
 		encodedInput = encodedInput[lineLength:]
 	}
 	outputDataLines = append(outputDataLines, []string{
-		fmt.Sprintf("\t%#v", ""),
-		")",
+		fmt.Sprintf("\t\t\t%#v,", ""),
+		"\t)",
+		"}",
 	}...)
 	for _, outputLine := range outputDataLines {
 		_, err := fmt.Fprintln(outputFile, outputLine)
